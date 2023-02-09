@@ -18,6 +18,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
   try{
     const eventCollection = client.db('volunteerNetwork').collection('events');
+    const registerCollection = client.db('volunteerNetwork').collection('registeredList');
 
     app.get('/events', async(req,res) =>{
       const query ={}
@@ -31,7 +32,21 @@ async function run() {
       const query ={_id :new ObjectId(id)};
       const event = await eventCollection.findOne(query);
       res.send(event);
+    })
 
+    //registeredLists api
+
+    app.post('/registeredLists', async(req,res) =>{
+      const registeredList = req.body;
+      const result = await registerCollection.insertOne(registeredList);
+      res.send(result);
+    });
+
+    app.get('/registeredLists', async(req, res) =>{
+      const query = {};
+      const cursor = registerCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
     })
 
   }
